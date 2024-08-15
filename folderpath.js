@@ -64,11 +64,12 @@ function folderPath(subfoldersList, targetID) {
 
 // Early exit, optimised
 
-function folderPaths(subfoldersList, targetIDs) {
-    // Map to hold the folder structure
+function preprocessPaths(subfoldersList) {
     const folderMap = new Map();
-    
-    // Build the graph from the given folder list
+    const paths = new Map();
+    const queue = [{ id: 0, path: "" }]; // Start with root folder
+
+    // Build the folder map
     subfoldersList.forEach(folder => {
         const { id, subfolders, name } = folder;
         if (!folderMap.has(id)) {
@@ -77,42 +78,35 @@ function folderPaths(subfoldersList, targetIDs) {
         folderMap.get(id).push({ name, subfolders });
     });
 
-    // Set to track targets
-    const targetsSet = new Set(targetIDs);
-    const paths = new Map();
-    
-    // Perform BFS to find the path to all target folders
-    const queue = folderMap.get(0).map(rootFolder => ({ path: rootFolder.name, id: 0 }));
-    
+    // Perform BFS to preprocess paths
     while (queue.length > 0) {
-        const { path, id } = queue.shift();
-        const currentFolders = folderMap.get(id);
+        const { id, path } = queue.shift();
+        const currentFolders = folderMap.get(id) || [];
 
         for (const folder of currentFolders) {
             const currentPath = `${path}/${folder.name}`;
 
-            // If it's a target folder, store the path
-            if (targetsSet.has(id)) {
-                paths.set(id, `/${currentPath}`);
-                targetsSet.delete(id); // Remove the found target from the set
-            }
+            // Store the path for this folder ID
+            paths.set(id, currentPath);
 
-            // Add subfolders to the queue for further exploration
+            // Add subfolders to the queue
             folder.subfolders.forEach(subfolderID => {
-                if (folderMap.has(subfolderID)) {
-                    queue.push({ path: currentPath, id: subfolderID });
-                }
+                queue.push({ id: subfolderID, path: currentPath });
             });
-        }
-
-        // Early exit if all targets are found
-        if (targetsSet.size === 0) {
-            break;
         }
     }
 
-    // Construct the result array
-    return targetIDs.map(id => paths.get(id) || "");
+    return paths;
+}
+
+function folderPaths(subfoldersList, targetIDs) {
+    // Preprocess paths from the root
+    const paths = preprocessPaths(subfoldersList);
+
+    // Retrieve paths for all target folders
+    return targetIDs.map(id => {
+        return paths.get(id) ? `/${paths.get(id)}` : "";
+    });
 }
 
 // Example usage:
