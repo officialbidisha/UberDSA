@@ -105,7 +105,7 @@ function folderPaths(subfoldersList, targetIDs) {
 
     // Retrieve paths for all target folders
     return targetIDs.map(id => {
-        return paths.get(id) ? `/${paths.get(id)}` : "";
+        return paths.get(id) ? `${paths.get(id)}` : "";
     });
 }
 
