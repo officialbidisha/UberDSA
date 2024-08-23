@@ -1,40 +1,31 @@
-/**
- * @param {number} n
- * @param {number[][]} meetings
- * @return {number}
- */
-
 var mostBooked = function(n, meetings) {
-    let rooms_meetings_counter = new Array(n).fill(0);
-    let available_rooms = new Array(n).fill(-1);
+    let roomUsage = new Array(n).fill(0);
+    let roomAvailability = new Array(n).fill(0);
+
     meetings.sort((a, b) => a[0] - b[0]);
 
-    meetings.map((meeting) => {
-        let [start, end] = meeting;
-        let earliestRoomIdx = 0;
-        let earliestEndTime = Number.MAX_SAFE_INTEGER;
-
-        let isAvailableRoomExist = false;
+    for (let [start, end] of meetings) {
+        let earliestRoom = 0;
+        let earliestTime = Infinity;
 
         for (let i = 0; i < n; i++) {
-            if (available_rooms[i] <= start) {
-                rooms_meetings_counter[i]++;
-                available_rooms[i] = end;
-                isAvailableRoomExist = true;
+            if (roomAvailability[i] <= start) {
+                roomUsage[i]++;
+                roomAvailability[i] = end;
+                earliestRoom = -1;
                 break;
             }
-
-            if (available_rooms[i] < earliestEndTime) {
-                earliestEndTime = available_rooms[i];
-                earliestRoomIdx = i;
+            if (roomAvailability[i] < earliestTime) {
+                earliestTime = roomAvailability[i];
+                earliestRoom = i;
             }
         }
 
-        if (!isAvailableRoomExist) {
-            rooms_meetings_counter[earliestRoomIdx]++;
-            available_rooms[earliestRoomIdx] += end - start;
+        if (earliestRoom !== -1) {
+            roomUsage[earliestRoom]++;
+            roomAvailability[earliestRoom] += end - start;
         }
-    });
+    }
 
-    return rooms_meetings_counter.indexOf(Math.max(...rooms_meetings_counter));
+    return roomUsage.indexOf(Math.max(...roomUsage));
 };
