@@ -1,60 +1,119 @@
-function getPathsToTarget(folderList, target) {
+function getPath(folderList, target) {
     let graph = new Map();
-    let folderNames = new Map();
-    
-    // Build the graph and folder names
-    for (let folder of folderList) {
-        graph.set(folder.id, folder.subfolders);
-        folderNames.set(folder.id, folder.name);
+  
+    // Build the graph
+    for (let i = 0; i < folderList.length; i++) {
+      let folder = folderList[i];
+      if (!graph.has(folder.id)) {
+        graph.set(folder.id, []);
+      }
+      graph
+        .get(folder.id)
+        .push({ name: folder.name, subfolders: folder.subfolders });
     }
-
-    // Initialize the queue with all root folders
-    let queue = [];
-    for (let folder of folderList) {
-        if (folder.id === 0) { // Assuming 0 is the root folder id
-            queue.push({ path: folder.name, id: folder.id });
-        }
-    }
-
-    let paths = [];
-
-    // Perform BFS to find all paths to the target folder
+  
+    // Initialize the queue with root folders
+    const queue = graph.get(0).map((rootFolder) => ({
+      path: rootFolder.name,
+      id: rootFolder.id,
+      subfolders: rootFolder.subfolders,
+    }));
+  
+    // Perform BFS to find the path to the target folder
     while (queue.length > 0) {
-        const { path, id } = queue.shift();
-
-        // Check if the current folder is the target
-        if (id === target) {
-            paths.push(path);
+      const { path, id, subfolders } = queue.shift();
+  
+      for (const subfolderId of subfolders) {
+        // console.log(subfolderId);
+        if (subfolderId === target) {
+          const targetFolder = graph.get(subfolderId);
+          return `${path}/${targetFolder[0].name}`;
         }
-
-        // Add subfolders to the queue
-        const subfolders = graph.get(id);
-        if (subfolders) {
-            for (const subfolderId of subfolders) {
-                queue.push({
-                    path: `${path}/${folderNames.get(subfolderId)}`,
-                    id: subfolderId
-                });
-            }
+  
+        const subfolder = graph.get(subfolderId);
+        if (subfolder) {
+          queue.push({
+            path: `${path}/${subfolder[0].name}`,
+            id: subfolderId,
+            subfolders: subfolder[0].subfolders,
+          });
         }
+      }
     }
-
-    return paths; // Return all paths to the target
-}
-
-// Example usage:
-const folderList = [
+  
+    return ""; // Return an empty string if the target is not found
+  }
+  
+  
+  /////// Preprocess
+  
+  function getPath(folderList, target) {
+    let graph = new Map();
+    let paths = new Map();
+  
+    // Build the graph
+    for (let i = 0; i < folderList.length; i++) {
+      let folder = folderList[i];
+      if (!graph.has(folder.id)) {
+        graph.set(folder.id, []);
+      }
+      graph.get(folder.id).push({
+        name: folder.name,
+        id: folder.id,
+        subfolders: folder.subfolders,
+      });
+    }
+  
+    // Initialize the queue with root folders and preprocess paths
+    const queue = graph.get(0).map((rootFolder) => ({
+      path: rootFolder.name,
+      id: rootFolder.id,
+      subfolders: rootFolder.subfolders,
+    }));
+  
+    while (queue.length > 0) {
+      const { path, id, subfolders } = queue.shift();
+  
+      // Store the current path in the paths map
+      paths.set(id, path);
+  
+      for (const subfolderId of subfolders) {
+        const subfolder = graph.get(subfolderId);
+        if (subfolder) {
+          queue.push({
+            path: `${path}/${subfolder[0].name}`,
+            id: subfolderId,
+            subfolders: subfolder[0].subfolders,
+          });
+        }
+      }
+    }
+  
+    // After preprocessing, retrieve the path for the target
+    return paths; // Return an empty string if the target is not found
+  }
+  
+  function folderPaths(subfoldersList, targetIDs) {
+    // Preprocess paths from the root
+    const paths = getPath(subfoldersList);
+  
+    // Retrieve paths for all target folders
+    return targetIDs.map((id) => {
+      return paths.get(id) ? `${paths.get(id)}` : "";
+    });
+  }
+  
+  // Example usage:
+  const folderList = [
     { id: 0, subfolders: [7, 3], name: "abc1" },
     { id: 0, subfolders: [9], name: "abc2" },
-    { id: 9, subfolders: [3], name: "abc3" },
+    { id: 9, subfolders: [], name: "abc3" },
     { id: 3, subfolders: [2], name: "abc4" },
     { id: 2, subfolders: [], name: "abc5" },
     { id: 7, subfolders: [], name: "abc6" },
     { id: 8, subfolders: [], name: "abc7" },
-];
-
-const targets = [2, 8, 7, 3, 9, 0];
-
-for (const target of targets) {
-    console.log(`Paths to ${target}: ${getPathsToTarget(folderList, target).join(', ')}`);
-}
+  ];
+  
+  const targets = [2, 8, 7, 3, 9, 0];
+  console.log(folderPaths(folderList, targets));
+  
