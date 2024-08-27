@@ -4,7 +4,7 @@
  * @param {number[][]} queries
  * @return {boolean[]}
  */
-var checkIfPrerequisite = function(n, pres, qs) {
+var CheckIfPrerequisite = function(n, pres, qs) {
     let graph = new Array(n);
     for(let i=0;i<n;i++){
         graph[i] = new Array(n).fill(0);
