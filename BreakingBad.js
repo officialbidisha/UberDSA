@@ -1,5 +1,3 @@
-/* https://leetcode.com/discuss/interview-experience/2008790/uber-phone-screen */
-
 function BreakingBad(name, symbols) {
   class TrieNode {
     constructor() {
@@ -26,8 +24,8 @@ function BreakingBad(name, symbols) {
 
     searchLongestPrefix(word) {
       let node = this.root;
-      let longestPrefix = '';
-      let currentPrefix = '';
+      let longestPrefix = "";
+      let currentPrefix = "";
       for (let char of word.toLowerCase()) {
         if (!node.children[char]) break;
         node = node.children[char];
@@ -46,17 +44,19 @@ function BreakingBad(name, symbols) {
     trie.insert(symbol);
   }
 
-  const words = name.split(' ');
+  const words = name.split(" ");
   let result = [];
 
   for (let word of words) {
     let modifiedWord = word;
-    let transformedWord = '';
+    let transformedWord = "";
 
     // Process each word entirely
     while (modifiedWord.length > 0) {
+      debugger;
       const match = trie.searchLongestPrefix(modifiedWord);
       if (match) {
+        debugger;
         // Add the matched symbol with brackets
         transformedWord += `[${modifiedWord.slice(0, match.length)}]`;
         modifiedWord = modifiedWord.slice(match.length); // Remove matched portion
@@ -70,27 +70,27 @@ function BreakingBad(name, symbols) {
     result.push(transformedWord);
   }
 
-  return result.join(' ');
+  return result.join(" ");
 }
 
 // Test case
 const symbols = [
-  'H',
-  'He',
-  'Li',
-  'Be',
-  'B',
-  'C',
-  'N',
-  'F',
-  'Ne',
-  'Na',
-  'Co',
-  'Ni',
-  'Cu',
-  'Ga',
-  'Al',
-  'Si',
+  "H",
+  "He",
+  "Li",
+  "Be",
+  "B",
+  "C",
+  "N",
+  "F",
+  "Ne",
+  "Na",
+  "Co",
+  "Ni",
+  "Cu",
+  "Ga",
+  "Al",
+  "Si",
 ];
 
-console.log(BreakingBad('henry alba', symbols));
+console.log(BreakingBad("henry alba", symbols));
