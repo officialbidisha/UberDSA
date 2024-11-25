@@ -1,86 +1,96 @@
 /* https://leetcode.com/discuss/interview-experience/2008790/uber-phone-screen */
 
-class TrieNode {
+function BreakingBad(name, symbols) {
+  class TrieNode {
     constructor() {
-        this.children = {};
-        this.isEnd = false; // Marks the end of a valid symbol
+      this.children = {};
+      this.isEnd = false;
     }
-}
+  }
 
-class Trie {
+  class Trie {
     constructor() {
-        this.root = new TrieNode();
+      this.root = new TrieNode();
     }
 
-    // Insert a symbol into the trie
-    insert(symbol) {
-        let currentNode = this.root;
-        for (const char of symbol) {
-            if (!currentNode.children[char]) {
-                currentNode.children[char] = new TrieNode();
-            }
-            currentNode = currentNode.children[char];
+    insert(word) {
+      let node = this.root;
+      for (let char of word.toLowerCase()) {
+        if (!node.children[char]) {
+          node.children[char] = new TrieNode();
         }
-        currentNode.isEnd = true;
+        node = node.children[char];
+      }
+      node.isEnd = true;
     }
 
-    // Search for the longest symbol in the trie starting from a word
     searchLongestPrefix(word) {
-        let currentNode = this.root;
-        let longestMatch = "";
-        let currentMatch = "";
-
-        for (const char of word) {
-            if (!currentNode.children[char]) break;
-
-            currentNode = currentNode.children[char];
-            currentMatch += char;
-
-            if (currentNode.isEnd) {
-                longestMatch = currentMatch; // Update longest valid match
-            }
+      let node = this.root;
+      let longestPrefix = '';
+      let currentPrefix = '';
+      for (let char of word.toLowerCase()) {
+        if (!node.children[char]) break;
+        node = node.children[char];
+        currentPrefix += char;
+        if (node.isEnd) {
+          longestPrefix = currentPrefix; // Update the longest valid match
         }
-
-        return longestMatch;
+      }
+      return longestPrefix;
     }
+  }
+
+  // Build the Trie with symbols
+  const trie = new Trie();
+  for (let symbol of symbols) {
+    trie.insert(symbol);
+  }
+
+  const words = name.split(' ');
+  let result = [];
+
+  for (let word of words) {
+    let modifiedWord = word;
+    let transformedWord = '';
+
+    // Process each word entirely
+    while (modifiedWord.length > 0) {
+      const match = trie.searchLongestPrefix(modifiedWord);
+      if (match) {
+        // Add the matched symbol with brackets
+        transformedWord += `[${modifiedWord.slice(0, match.length)}]`;
+        modifiedWord = modifiedWord.slice(match.length); // Remove matched portion
+      } else {
+        // Add the first unmatched character
+        transformedWord += modifiedWord[0];
+        modifiedWord = modifiedWord.slice(1);
+      }
+    }
+
+    result.push(transformedWord);
+  }
+
+  return result.join(' ');
 }
 
-/**
- * Function to replace symbols in a name with bracketed forms using a Trie.
- * @param {string} name - The input name.
- * @param {string[]} symbols - List of symbols to match.
- * @param {boolean} replaceAll - Whether to replace all occurrences of symbols or just the first match.
- * @return {string} - The formatted phrase with symbols bracketed.
- */
-function BreakingBad(name, symbols, replaceAll = false) {
-    // Create a trie and insert all symbols
-    const trie = new Trie();
-    for (const symbol of symbols) {
-        trie.insert(symbol.toLowerCase());
-    }
+// Test case
+const symbols = [
+  'H',
+  'He',
+  'Li',
+  'Be',
+  'B',
+  'C',
+  'N',
+  'F',
+  'Ne',
+  'Na',
+  'Co',
+  'Ni',
+  'Cu',
+  'Ga',
+  'Al',
+  'Si',
+];
 
-    const words = name.split(" ");
-    const bracketedWords = words.map(word => {
-        let modifiedWord = word;
-        let result = "";
-
-        while (modifiedWord.length > 0) {
-            const match = trie.searchLongestPrefix(modifiedWord.toLowerCase());
-            if (match) {
-                // Replace the matched symbol
-                const startIndex = modifiedWord.toLowerCase().indexOf(match);
-                result += `[${modifiedWord.slice(startIndex, startIndex + match.length)}]`;
-                modifiedWord = modifiedWord.slice(startIndex + match.length);
-                if (!replaceAll) break;
-            } else {
-                // Add the first character and continue
-                result += modifiedWord[0];
-                modifiedWord = modifiedWord.slice(1);
-            }
-        }
-
-        return result;
-    });
-
-    return bracketedWords.join(" ");
-}
+console.log(BreakingBad('henry alba', symbols));
