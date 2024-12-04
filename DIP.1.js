@@ -64,59 +64,6 @@ const asyncGraph = {
   },
 };
 
-// const asyncGraph = {
-//   a: {
-//     dependencyList: [],
-//     task: (done) => {
-//       console.log("Calling A");
-//       setTimeout(() => {
-//         console.log("Task A Completed");
-//         done();
-//       }, 500);
-//     },
-//   },
-//   b: {
-//     dependencyList: [],
-//     task: (done) => {
-//       console.log("Calling B");
-//       setTimeout(() => {
-//         console.log("Task B Completed");
-//         done();
-//       }, 2000);
-//     },
-//   },
-//   c: {
-//     dependencyList: [],
-//     task: (done) => {
-//       console.log("Calling C");
-//       setTimeout(() => {
-//         console.log("Task C Completed");
-//         done();
-//       }, 200);
-//     },
-//   },
-//   d: {
-//     dependencyList: ["a", "b"], // D depends on A and B
-//     task: (done) => {
-//       console.log("Calling D");
-//       setTimeout(() => {
-//         console.log("Task D Completed");
-//         done();
-//       }, 500);
-//     },
-//   },
-//   e: {
-//     dependencyList: ["c", "d"], // E depends on C and D
-//     task: (done) => {
-//       console.log("Calling E");
-//       setTimeout(() => {
-//         console.log("Task E Completed");
-//         done();
-//       }, 500);
-//     },
-//   },
-// };
-
 // Step 2: Function to execute the tasks
 function runTasks(graph, callback) {
   const dependencyCount = {}; // Tracks unresolved dependencies
