@@ -4,7 +4,8 @@
 memoize is a function that takes one argument, asynchronousFunction:
 function memoize(asynchronousFunction) { }
 
-where asynchronousFunction is a function that takes n arguments. The last argument of asynchronousFunction is a callback in the form of function callback(error, result).
+where asynchronousFunction is a function that takes n arguments. The last argument of asynchronousFunction 
+is a callback in the form of function callback(error, result).
 Here's an example of asynchronousFunction:
 function getSomeData(foo, bar, callback) {
   var uri = 'http://localhost?foo=' + foo + '&bar=' + bar;
@@ -15,9 +16,11 @@ function getSomeData(foo, bar, callback) {
 
 Calling getSomeData with the same foo and bar arguments should result in the callback firing with the same data.
 However, calling getSomeData multiple times, even with the same arguments will always trigger the costly XHR call.
-One way to optimize repeated calls of getSomeData, we can create memoizedGetSomeData = memoize(getSomeData). memoizedGetSomeData should return a function of the same interface as getSomeData.
+One way to optimize repeated calls of getSomeData, we can create memoizedGetSomeData = memoize(getSomeData). 
+memoizedGetSomeData should return a function of the same interface as getSomeData.
 Calling memoizedGetSomeData with the same arguments multiple times should result in the callback being fired with the same result.
-The result should be cached on the first invocation, and retrieved from the cache on every consecutive invocation, preventing the costly request call.
+The result should be cached on the first invocation, and retrieved from the cache on every consecutive invocation, 
+preventing the costly request call.
 
 Task:
 Implement memoize.
